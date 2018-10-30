@@ -76,10 +76,11 @@ RUN export MYSQL_DRIVER_VERSION=5.1.44 && \
     wget -O /home/${CONTAINER_USER}/SSLPoke.class https://confluence.atlassian.com/kb/files/779355358/779355357/1/1441897666313/SSLPoke.class && \
     chown -R crowd:crowd /home/${CONTAINER_USER}
 ADD splash-context.xml /opt/crowd/webapps/splash.xml
+ADD server.xml /opt/crowd/server.xml
 RUN chown -R crowd:crowd ${CROWD_HOME} && \
     chown -R crowd:crowd ${CROWD_INSTALL} && \
     # Install Tini Zombie Reaper And Signal Forwarder
-    export TINI_VERSION=0.9.0 && \
+    export TINI_VERSION=0.18.0 && \
     curl -fsSL https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static -o /bin/tini && \
     chmod +x /bin/tini && \
     # Remove obsolete packages
@@ -107,7 +108,7 @@ LABEL com.blacklabelops.application.crowd.version=$CROWD_VERSION \
 
 WORKDIR /var/atlassian/crowd
 VOLUME ["/var/atlassian/crowd"]
-EXPOSE 8095
+EXPOSE 8443
 COPY imagescripts /home/crowd
 ENTRYPOINT ["/bin/tini","--","/home/crowd/docker-entrypoint.sh"]
 CMD ["crowd"]

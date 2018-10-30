@@ -113,4 +113,11 @@ if [ -f "${CROWD_HOME}/crowd.properties" ]; then
   config_line ${CROWD_HOME}/crowd.properties application.login.url "$(config_line crowd-webapp/WEB-INF/classes/crowd.properties application.login.url)"
 fi
 
+mv /opt/crowd/server.xml /opt/crowd/apache-tomcat/conf/server.xml
+chown crowd:crowd /opt/crowd/apache-tomcat/conf/server.xml
+
+mkdir /opt/crowd/apache-tomcat/webapps/ROOT
+echo '<% response.sendRedirect("/crowd/"); %>' > /opt/crowd/apache-tomcat/webapps/ROOT/index.jsp
+chown -R crowd:crowd /opt/crowd/apache-tomcat/webapps/ROOT
+
 apache-tomcat/bin/catalina.sh run
