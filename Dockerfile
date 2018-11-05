@@ -15,6 +15,9 @@ ENV CROWD_HOME=/var/atlassian/crowd \
     CROWD_PROXY_SCHEME= \
     KEYSTORE=$JAVA_HOME/jre/lib/security/cacerts
 
+ADD splash-context.xml /opt/crowd/webapps/splash.xml
+ADD server.xml /opt/crowd/server.xml
+
 RUN export MYSQL_DRIVER_VERSION=5.1.44 && \
     export CONTAINER_USER=crowd &&  \
     export CONTAINER_GROUP=crowd &&  \
@@ -39,8 +42,8 @@ RUN export MYSQL_DRIVER_VERSION=5.1.44 && \
     ls -A /tmp && \
     mv /tmp/atlassian-crowd-${CROWD_VERSION} /tmp/crowd && \
     ls -A /tmp && \
-    mkdir -p /opt && \
-    mv /tmp/crowd /opt/crowd && \
+    mkdir -p /opt/crowd && \
+    mv /tmp/crowd/* /opt/crowd && \
     mkdir -p ${CROWD_HOME} && \
     mkdir -p ${CROWD_INSTALL}/crowd-webapp/WEB-INF/classes && \
     mkdir -p ${CROWD_INSTALL}/apache-tomcat/lib && \
@@ -74,10 +77,9 @@ RUN export MYSQL_DRIVER_VERSION=5.1.44 && \
     keytool -trustcacerts -keystore $KEYSTORE -storepass changeit -noprompt -importcert -alias letsencryptauthorityx4 -file /tmp/lets-encrypt-x4-cross-signed.der && \
     # Install atlassian ssl tool
     wget -O /home/${CONTAINER_USER}/SSLPoke.class https://confluence.atlassian.com/kb/files/779355358/779355357/1/1441897666313/SSLPoke.class && \
-    chown -R crowd:crowd /home/${CONTAINER_USER}
-ADD splash-context.xml /opt/crowd/webapps/splash.xml
-ADD server.xml /opt/crowd/server.xml
-RUN chown -R crowd:crowd ${CROWD_HOME} && \
+    chown -R crowd:crowd /home/${CONTAINER_USER} && \
+    rm -rf /opt/crowd/crowd-openid* && \
+    chown -R crowd:crowd ${CROWD_HOME} && \
     chown -R crowd:crowd ${CROWD_INSTALL} && \
     # Install Tini Zombie Reaper And Signal Forwarder
     export TINI_VERSION=0.18.0 && \
